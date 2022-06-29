@@ -1,35 +1,106 @@
 package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
+import jm.task.core.jdbc.util.Util;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
+
+
     public UserDaoJDBCImpl() {
 
     }
 
+
+    Statement statement;
+    {
+        try {
+            statement = Util.getConnection().createStatement();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void createUsersTable() {
+        try {
+            statement.addBatch("CREATE TABLE if not exists `mydbtest`.`users` (\n" +
+                    "  `id` INT NOT NULL AUTO_INCREMENT,\n" +
+                    "  `name` VARCHAR(45) NOT NULL,\n" +
+                    "  `lastName` VARCHAR(45) NOT NULL,\n" +
+                    "  `age` INT(3) NOT NULL,\n" +
+                    "  PRIMARY KEY (`id`),\n" +
+                    "  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);");
+
+            statement.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
     public void dropUsersTable() {
+        try {
+            statement.execute("drop table if exists users");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
     public void saveUser(String name, String lastName, byte age) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("INSERT INTO users (name, lastName, age) values ('").append(name).append("', '").append(lastName).append("', ").append(age).append(")");
+        try {
+            statement.execute(stringBuilder.toString());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
     public void removeUserById(long id) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("DELETE FROM users where id = ").append(id);
+        try {
+            statement.execute(stringBuilder.toString());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
     public List<User> getAllUsers() {
-        return null;
+        List<User> users = new ArrayList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery("select * from users");
+            while (resultSet.next()) {
+                Long id = resultSet.getLong( 1);
+                String name = resultSet.getString(2);
+                String lastName = resultSet.getString(3);
+                byte age = resultSet.getByte(4);
+                User user = new User(id, name, lastName, age);
+                users.add(user);
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
     }
 
     public void cleanUsersTable() {
+        try {
+            statement.execute("DELETE FROM users");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 }
