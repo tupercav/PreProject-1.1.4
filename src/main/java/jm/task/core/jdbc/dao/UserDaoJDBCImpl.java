@@ -54,10 +54,9 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("INSERT INTO users (name, lastName, age) values ('").append(name).append("', '").append(lastName).append("', ").append(age).append(")");
+        String sqlQuery = String.format("INSERT INTO users (name, lastName, age) VALUES ('%s', '%s', (%d))", name, lastName, age);
         try {
-            statement.execute(stringBuilder.toString());
+            statement.execute(sqlQuery);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -65,10 +64,9 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("DELETE FROM users where id = ").append(id);
+        String sqlQuery = String.format("DELETE FROM users WHERE id = (%d)", id);
         try {
-            statement.execute(stringBuilder.toString());
+            statement.execute(sqlQuery);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -87,6 +85,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setAge(resultSet.getByte(4));
                 users.add(user);
 
+                
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
