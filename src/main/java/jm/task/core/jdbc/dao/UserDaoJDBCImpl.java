@@ -80,11 +80,11 @@ public class UserDaoJDBCImpl implements UserDao {
         try {
             ResultSet resultSet = statement.executeQuery("select * from users");
             while (resultSet.next()) {
-                Long id = resultSet.getLong( 1);
-                String name = resultSet.getString(2);
-                String lastName = resultSet.getString(3);
-                byte age = resultSet.getByte(4);
-                User user = new User(id, name, lastName, age);
+                User user = new User();
+                user.setId(resultSet.getLong(1));
+                user.setName(resultSet.getString(2));
+                user.setLastName(resultSet.getString(3));
+                user.setAge(resultSet.getByte(4));
                 users.add(user);
 
             }
